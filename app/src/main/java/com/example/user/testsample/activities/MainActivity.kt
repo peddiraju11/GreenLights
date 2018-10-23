@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import com.example.user.testsample.MyApp
 import com.example.user.testsample.R
@@ -28,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pDialog: ProgressDialog;
     private lateinit var mDb: TestDB
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -48,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             return;
         }
         val apiService = ApiService.create();
-        pDialog = ProgressDialog.show(this, "Loading", "Loading");
+        pDialog = ProgressDialog.show(this, "Loading", "Please wait..");
 
 
         //Fetch the data from API
@@ -60,8 +63,13 @@ class MainActivity : AppCompatActivity() {
 
                     var list: List<Employee> = response.body()!!
 
-                    listdata.addAll(list);
-                    mAdapter.notifyDataSetChanged();
+                    if (list.size > 0) {
+                        textView.visibility = View.GONE
+                        listdata.addAll(list)
+                        mAdapter.notifyDataSetChanged()
+                    } else {
+                        textView.visibility = View.VISIBLE
+                    }
 
                     object : AsyncTask<Void, Void, Void>() {
                         override fun doInBackground(vararg voids: Void): Void? {
@@ -93,17 +101,25 @@ class MainActivity : AppCompatActivity() {
 
     //Fetch the data from Local DB
     private fun fetchDataFromDb() {
-        pDialog = ProgressDialog.show(this, "Loading", "Loading");
+
+        pDialog = ProgressDialog.show(this, "Loading", "Please wait..");
         object : AsyncTask<Void, Void, Void>() {
             override fun doInBackground(vararg voids: Void): Void? {
                 var list: List<Employee> = mDb.employeeDao().allEmployees();
-                listdata.addAll(list);
+
+                if (list.size > 0) {
+                    textView.visibility = View.GONE
+                    listdata.addAll(list)
+                    mAdapter.notifyDataSetChanged()
+                } else {
+                    textView.visibility = View.VISIBLE
+                }
+
                 return null
             }
         }.execute()
         if (pDialog != null && pDialog.isShowing)
             pDialog.dismiss()
-        mAdapter.notifyDataSetChanged();
     }
 
     //Delete a item from Local DB
