@@ -64,13 +64,10 @@ class MainActivity : AppCompatActivity() {
                     var list: List<Employee> = response.body()!!
 
                     if (list.size > 0) {
-                        textView.visibility = View.GONE
+
                         listdata.addAll(list)
                         mAdapter.notifyDataSetChanged()
-                    } else {
-                        textView.visibility = View.VISIBLE
                     }
-
                     object : AsyncTask<Void, Void, Void>() {
                         override fun doInBackground(vararg voids: Void): Void? {
                             for (item: Employee in list.iterator()) {
@@ -108,14 +105,18 @@ class MainActivity : AppCompatActivity() {
                 var list: List<Employee> = mDb.employeeDao().allEmployees();
 
                 if (list.size > 0) {
-                    textView.visibility = View.GONE
+
                     listdata.addAll(list)
-                    mAdapter.notifyDataSetChanged()
-                } else {
-                    textView.visibility = View.VISIBLE
                 }
 
                 return null
+            }
+
+            override fun onPostExecute(result: Void?) {
+                super.onPostExecute(result)
+
+                mAdapter.notifyDataSetChanged()
+
             }
         }.execute()
         if (pDialog != null && pDialog.isShowing)
